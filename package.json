@@ -1,0 +1,79 @@
+{
+  "name": "arabic-to-english-form-translator",
+  "version": "1.0.0",
+  "description": "Arabic to English translation and Word document generation",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron-forge start",
+    "package": "electron-forge package",
+    "make": "electron-forge make",
+    "publish": "electron-forge publish"
+  },
+  "keywords": [
+    "translation",
+    "arabic",
+    "english",
+    "electron",
+    "word"
+  ],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@electron-forge/cli": "^7.8.1",
+    "@electron-forge/maker-deb": "^7.8.1",
+    "@electron-forge/maker-rpm": "^7.8.1",
+    "@electron-forge/maker-squirrel": "^7.8.1",
+    "@electron-forge/maker-zip": "^7.8.1",
+    "@electron-forge/plugin-auto-unpack-natives": "^7.8.1",
+    "@electron-forge/plugin-fuses": "^7.8.1",
+    "@electron/fuses": "^1.8.0",
+    "electron": "^36.4.0"
+  },
+  "dependencies": {
+    "@google-cloud/translate": "^9.1.0",
+    "@vitalets/google-translate-api": "^9.2.1",
+    "axios": "^1.9.0",
+    "docxtemplater": "^3.63.2",
+    "electron-squirrel-startup": "^1.0.1",
+    "libreoffice-convert": "^1.6.1",
+    "pizzip": "^3.2.0"
+  },
+  "config": {
+    "forge": {
+      "packagerConfig": {
+        "icon": "./logo"
+      },
+      "makers": [
+        {
+          "name": "@electron-forge/maker-squirrel",
+          "config": {
+            "iconUrl": "https://raw.githubusercontent.com/your-repo/logo.png",
+            "setupIcon": "./logo.ico"
+          }
+        },
+        {
+          "name": "@electron-forge/maker-zip",
+          "platforms": [
+            "darwin"
+          ]
+        },
+        {
+          "name": "@electron-forge/maker-deb",
+          "config": {
+            "options": {
+              "icon": "./logo.png"
+            }
+          }
+        },
+        {
+          "name": "@electron-forge/maker-rpm",
+          "config": {
+            "options": {
+              "icon": "./logo.png"
+            }
+          }
+        }
+      ]
+    }
+  }
+}

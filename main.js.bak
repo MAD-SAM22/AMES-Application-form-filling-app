@@ -1,0 +1,75 @@
+const { app, BrowserWindow, ipcMain, dialog } = require('electron');
+const path = require('path');
+const fs = require('fs');
+const PizZip = require('pizzip');
+const Docxtemplater = require('docxtemplater');
+
+function createWindow() {
+  const win = new BrowserWindow({
+    width: 1024,
+    height: 768,
+    webPreferences: {
+      preload: path.join(__dirname, 'preload.js'),
+      contextIsolation: true,
+      nodeIntegration: false,
+    },
+  });
+
+  win.loadFile('index.html');
+}
+
+app.whenReady().then(createWindow);
+
+app.on('window-all-closed', () => {
+  if (process.platform !== 'darwin') app.quit();
+});
+
+ipcMain.handle('generate-document', async (event, translations) => {
+  try {
+    // Read the template file
+    const templatePath = path.join(__dirname, 'template.docx');
+    const content = fs.readFileSync(templatePath, 'binary');
+
+    // Create a new instance of PizZip with the content
+    const zip = new PizZip(content);
+
+    // Create a new instance of Docxtemplater
+    const doc = new Docxtemplater(zip, {
+      paragraphLoop: true,
+      linebreaks: true,
+    });
+
+    // Set the data to be injected into the template
+    doc.render({
+      text1: translations.text1 || '',
+      text2: translations.text2 || '',
+      text3: translations.text3 || '',
+      date: new Date().toLocaleDateString(),
+    });
+
+    // Get the document as a buffer
+    const buffer = doc.getZip().generate({
+      type: 'nodebuffer',
+      compression: 'DEFLATE',
+    });
+
+    // Show save dialog
+    const { canceled, filePath } = await dialog.showSaveDialog({
+      title: 'Save Translated Document',
+      defaultPath: `translated_${new Date().toISOString().split('T')[0]}.docx`,
+      filters: [{ name: 'Word Document', extensions: ['docx'] }],
+    });
+
+    if (canceled || !filePath) {
+      return { success: false, message: 'Save cancelled by user.' };
+    }
+
+    // Write the buffer to the file
+    fs.writeFileSync(filePath, buffer);
+
+    return { success: true, message: `Document saved successfully at:\n${filePath}` };
+  } catch (error) {
+    console.error('Document generation error:', error);
+    return { success: false, message: `Error generating document: ${error.message}` };
+  }
+});

@@ -1,0 +1,1086 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Arabic to English Form Translator</title>
+  <style>
+    :root {
+      --primary-color: #2563eb;
+      --secondary-color: #1e40af;
+      --success-color: #16a34a;
+      --error-color: #dc2626;
+      --background-color: #f8fafc;
+      --border-color: #e2e8f0;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      line-height: 1.6;
+      background-color: var(--background-color);
+      color: #1a1a1a;
+      padding: 2rem;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .app-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: white;
+      padding: 1rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      height: calc(100vh - 4rem);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .app-header {
+      text-align: center;
+      margin-bottom: 2rem;
+      padding-bottom: 1rem;
+      border-bottom: 2px solid var(--border-color);
+      flex-shrink: 0;
+    }
+
+    .app-title {
+      font-size: 2rem;
+      color: var(--primary-color);
+      margin-bottom: 0.5rem;
+    }
+
+    .app-description {
+      color: #666;
+      font-size: 1rem;
+    }
+
+    .form-container {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 2rem;
+      overflow-y: auto;
+      padding-right: 1rem;
+      margin-bottom: 2rem;
+      flex-grow: 1;
+    }
+
+    .form-column {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .form-label {
+      font-weight: 600;
+      color: #374151;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 0.75rem;
+      border: 2px solid var(--border-color);
+      border-radius: 6px;
+      font-size: 1rem;
+      transition: border-color 0.2s ease;
+      resize: vertical;
+      min-height: 42px;
+    }
+
+    .form-control[dir="rtl"] {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: var(--primary-color);
+    }
+
+    .actions {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      padding: 1rem;
+      background: white;
+      border-top: 1px solid var(--border-color);
+      flex-shrink: 0;
+    }
+
+    .btn {
+      padding: 0.75rem 1.5rem;
+      font-size: 1rem;
+      font-weight: 600;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      min-width: 150px;
+      justify-content: center;
+    }
+
+    .btn-primary {
+      background-color: var(--primary-color);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background-color: var(--secondary-color);
+    }
+
+    .btn-success {
+      background-color: var(--success-color);
+      color: white;
+    }
+
+    .btn-success:hover {
+      filter: brightness(110%);
+    }
+
+    .btn:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+
+    .status {
+      text-align: center;
+      margin-top: 1rem;
+      padding: 1rem;
+      border-radius: 6px;
+      font-weight: 500;
+    }
+
+    .status.loading {
+      background-color: #dbeafe;
+      color: var(--primary-color);
+    }
+
+    .status.success {
+      background-color: #dcfce7;
+      color: var(--success-color);
+    }
+
+    .status.error {
+      background-color: #fee2e2;
+      color: var(--error-color);
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 1rem;
+      height: 1rem;
+      border: 2px solid currentColor;
+      border-right-color: transparent;
+      border-radius: 50%;
+      animation: spin 0.75s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #888;
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: #555;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <header class="app-header">
+      <h1 class="app-title">Arabic to English Form Translator</h1>
+      <p class="app-description">Fill in the Arabic fields and translate to English</p>
+    </header>
+
+    <main class="form-container">
+      <div class="form-column">
+        <!-- 1. Application Details -->
+        <div class="form-section">
+          <h2 class="section-title">Application Details</h2>
+          <div class="form-group">
+            <label class="form-label" for="arabic-applicant-name">الاسم الكامل للمتقدم</label>
+            <input type="text" class="form-control" id="arabic-applicant-name" dir="rtl" placeholder="أدخل الاسم الكامل">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="arabic-visa-expiry">تاريخ انتهاء التأشيرة الحالية</label>
+            <input type="text" class="form-control" id="arabic-visa-expiry" dir="rtl" placeholder="أدخل تاريخ انتهاء التأشيرة">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="arabic-personal-dob">تاريخ الميلاد</label>
+            <input type="text" class="form-control" id="arabic-personal-dob" dir="rtl" placeholder="أدخل تاريخ الميلاد">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="arabic-personal-email">البريد الإلكتروني</label>
+            <input type="text" class="form-control" id="arabic-personal-email" dir="rtl" placeholder="أدخل البريد الإلكتروني">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="arabic-personal-mobile">رقم الجوال</label>
+            <input type="text" class="form-control" id="arabic-personal-mobile" dir="rtl" placeholder="أدخل رقم الجوال">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="arabic-personal-address">العنوان في البلد الأصلي</label>
+            <textarea class="form-control" id="arabic-personal-address" dir="rtl" placeholder="أدخل العنوان"></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="arabic-personal-address-aus">العنوان في أستراليا (إن وجد)</label>
+            <textarea class="form-control" id="arabic-personal-address-aus" dir="rtl" placeholder="أدخل العنوان في أستراليا"></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="arabic-personal-marital">الحالة الاجتماعية</label>
+            <input type="text" class="form-control" id="arabic-personal-marital" dir="rtl" placeholder="أدخل الحالة الاجتماعية">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="arabic-personal-medical">الحالة الصحية (إن وجدت)</label>
+            <textarea class="form-control" id="arabic-personal-medical" dir="rtl" placeholder="أدخل الحالة الصحية"></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="arabic-personal-criminal">السجل الجنائي (إن وجد)</label>
+            <textarea class="form-control" id="arabic-personal-criminal" dir="rtl" placeholder="أدخل السجل الجنائي"></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="arabic-personal-visa-applied">هل تقدمت بطلب تأشيرة لأي بلد؟</label>
+            <select class="form-control" id="arabic-personal-visa-applied" dir="rtl">
+              <option value="">اختر...</option>
+              <option value="نعم">نعم</option>
+              <option value="لا">لا</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="arabic-personal-visa-status">إذا كانت الإجابة نعم، هل تمت الموافقة عليها أم لا؟</label>
+            <textarea class="form-control" id="arabic-personal-visa-status" dir="rtl" placeholder="أدخل حالة التأشيرة"></textarea>
+          </div>
+        </div>
+
+        <!-- 2. Travel History -->
+        <div class="form-section">
+          <h2 class="section-title">Travel History</h2>
+          <div class="form-group">
+            <label class="form-label" for="arabic-travel-origin">بلد المنشأ</label>
+            <input type="text" class="form-control" id="arabic-travel-origin" dir="rtl" placeholder="أدخل بلد المنشأ">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="arabic-travel-destination">بلد المقصد</label>
+            <input type="text" class="form-control" id="arabic-travel-destination" dir="rtl" placeholder="أدخل بلد المقصد">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="arabic-travel-date-from">تاريخ من</label>
+            <input type="text" class="form-control" id="arabic-travel-date-from" dir="rtl" placeholder="أدخل تاريخ البداية">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="arabic-travel-date-until">تاريخ حتى</label>
+            <input type="text" class="form-control" id="arabic-travel-date-until" dir="rtl" placeholder="أدخل تاريخ النهاية">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="arabic-travel-reason">سبب الزيارة</label>
+            <textarea class="form-control" id="arabic-travel-reason" dir="rtl" placeholder="أدخل سبب الزيارة"></textarea>
+          </div>
+        </div>
+
+        <!-- 3. Family Information -->
+        <div class="form-section">
+          <h2 class="section-title">Family Information</h2>
+          <!-- Father -->
+          <div class="family-member">
+            <h3 class="subsection-title">Father</h3>
+            <div class="form-group">
+              <label class="form-label" for="arabic-father-name">اسم الأب</label>
+              <input type="text" class="form-control" id="arabic-father-name" dir="rtl" placeholder="أدخل اسم الأب">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="arabic-father-dob">تاريخ ميلاد الأب</label>
+              <input type="text" class="form-control" id="arabic-father-dob" dir="rtl" placeholder="أدخل تاريخ الميلاد">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="arabic-father-gender">جنس الأب</label>
+              <input type="text" class="form-control" id="arabic-father-gender" dir="rtl" value="ذكر" readonly>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="arabic-father-residence">محل إقامة الأب</label>
+              <input type="text" class="form-control" id="arabic-father-residence" dir="rtl" placeholder="أدخل محل الإقامة">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="arabic-father-employment">تفاصيل عمل الأب</label>
+              <textarea class="form-control" id="arabic-father-employment" dir="rtl" placeholder="أدخل تفاصيل العمل"></textarea>
+            </div>
+          </div>
+
+          <!-- Mother -->
+          <div class="family-member">
+            <h3 class="subsection-title">Mother</h3>
+            <div class="form-group">
+              <label class="form-label" for="arabic-mother-name">اسم الأم</label>
+              <input type="text" class="form-control" id="arabic-mother-name" dir="rtl" placeholder="أدخل اسم الأم">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="arabic-mother-dob">تاريخ ميلاد الأم</label>
+              <input type="text" class="form-control" id="arabic-mother-dob" dir="rtl" placeholder="أدخل تاريخ الميلاد">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="arabic-mother-gender">جنس الأم</label>
+              <input type="text" class="form-control" id="arabic-mother-gender" dir="rtl" value="أنثى" readonly>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="arabic-mother-residence">محل إقامة الأم</label>
+              <input type="text" class="form-control" id="arabic-mother-residence" dir="rtl" placeholder="أدخل محل الإقامة">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="arabic-mother-employment">تفاصيل عمل الأم</label>
+              <textarea class="form-control" id="arabic-mother-employment" dir="rtl" placeholder="أدخل تفاصيل العمل"></textarea>
+            </div>
+          </div>
+
+          <!-- Father-in-law -->
+          <div class="family-member">
+            <h3 class="subsection-title">Father-in-law</h3>
+            <div class="form-group">
+              <label class="form-label" for="arabic-father-in-law-name">اسم والد الزوج/الزوجة</label>
+              <input type="text" class="form-control" id="arabic-father-in-law-name" dir="rtl" placeholder="أدخل الاسم">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="arabic-father-in-law-dob">تاريخ الميلاد</label>
+              <input type="text" class="form-control" id="arabic-father-in-law-dob" dir="rtl" placeholder="أدخل تاريخ الميلاد">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="arabic-father-in-law-gender">الجنس</label>
+              <select class="form-control" id="arabic-father-in-law-gender" dir="rtl">
+                <option value="ذكر">ذكر</option>
+                <option value="أنثى">أنثى</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="arabic-father-in-law-residence">محل الإقامة</label>
+              <input type="text" class="form-control" id="arabic-father-in-law-residence" dir="rtl" placeholder="أدخل محل الإقامة">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="arabic-father-in-law-employment">تفاصيل العمل</label>
+              <textarea class="form-control" id="arabic-father-in-law-employment" dir="rtl" placeholder="أدخل تفاصيل العمل"></textarea>
+            </div>
+          </div>
+
+          <!-- Mother-in-law -->
+          <div class="family-member">
+            <h3 class="subsection-title">Mother-in-law</h3>
+            <div class="form-group">
+              <label class="form-label" for="arabic-mother-in-law-name">اسم والدة الزوج/الزوجة</label>
+              <input type="text" class="form-control" id="arabic-mother-in-law-name" dir="rtl" placeholder="أدخل الاسم">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="arabic-mother-in-law-dob">تاريخ الميلاد</label>
+              <input type="text" class="form-control" id="arabic-mother-in-law-dob" dir="rtl" placeholder="أدخل تاريخ الميلاد">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="arabic-mother-in-law-gender">الجنس</label>
+              <select class="form-control" id="arabic-mother-in-law-gender" dir="rtl">
+                <option value="ذكر">ذكر</option>
+                <option value="أنثى">أنثى</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="arabic-mother-in-law-residence">محل الإقامة</label>
+              <input type="text" class="form-control" id="arabic-mother-in-law-residence" dir="rtl" placeholder="أدخل محل الإقامة">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="arabic-mother-in-law-employment">تفاصيل العمل</label>
+              <textarea class="form-control" id="arabic-mother-in-law-employment" dir="rtl" placeholder="أدخل تفاصيل العمل"></textarea>
+            </div>
+          </div>
+
+          <!-- Spouse/Partner -->
+          <div class="family-member">
+            <h3 class="subsection-title">Spouse/Partner</h3>
+            <div class="form-group">
+              <label class="form-label" for="arabic-spouse-name">اسم الزوج/الزوجة</label>
+              <input type="text" class="form-control" id="arabic-spouse-name" dir="rtl" placeholder="أدخل الاسم">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="arabic-spouse-dob">تاريخ الميلاد</label>
+              <input type="text" class="form-control" id="arabic-spouse-dob" dir="rtl" placeholder="أدخل تاريخ الميلاد">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="arabic-spouse-gender">الجنس</label>
+              <select class="form-control" id="arabic-spouse-gender" dir="rtl">
+                <option value="ذكر">ذكر</option>
+                <option value="أنثى">أنثى</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="arabic-spouse-residence">محل الإقامة</label>
+              <input type="text" class="form-control" id="arabic-spouse-residence" dir="rtl" placeholder="أدخل محل الإقامة">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="arabic-spouse-employment">تفاصيل العمل</label>
+              <textarea class="form-control" id="arabic-spouse-employment" dir="rtl" placeholder="أدخل تفاصيل العمل"></textarea>
+            </div>
+          </div>
+
+          <!-- Siblings -->
+          <div class="family-member">
+            <h3 class="subsection-title">Sisters/Brothers</h3>
+            <div class="form-group">
+              <label class="form-label" for="siblings-count">Number of Siblings</label>
+              <select class="form-control" id="siblings-count" dir="rtl">
+                <option value="0">0</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+                <option value="9">9</option>
+                <option value="10">10</option>
+              </select>
+            </div>
+            <div id="siblings-container">
+              <!-- Dynamic sibling fields will be added here -->
+            </div>
+          </div>
+
+          <!-- Children -->
+          <div class="family-member">
+            <h3 class="subsection-title">Children</h3>
+            <div class="form-group">
+              <label class="form-label" for="children-count">Number of Children</label>
+              <select class="form-control" id="children-count" dir="rtl">
+                <option value="0">0</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+                <option value="9">9</option>
+                <option value="10">10</option>
+              </select>
+            </div>
+            <div id="children-container">
+              <!-- Dynamic children fields will be added here -->
+            </div>
+          </div>
+        </div>
+
+        <!-- 4. Emergency Contacts -->
+        <div class="form-section">
+          <h2 class="section-title">Emergency Contacts</h2>
+          <!-- Home Country -->
+          <div class="emergency-contact">
+            <h3 class="subsection-title">Home Country</h3>
+            <div class="form-group">
+              <label class="form-label" for="arabic-emergency-home-name">الاسم</label>
+              <input type="text" class="form-control" id="arabic-emergency-home-name" dir="rtl" placeholder="أدخل الاسم">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="arabic-emergency-home-relationship">صلة القرابة</label>
+              <input type="text" class="form-control" id="arabic-emergency-home-relationship" dir="rtl" placeholder="أدخل صلة القرابة">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="arabic-emergency-home-address">العنوان</label>
+              <textarea class="form-control" id="arabic-emergency-home-address" dir="rtl" placeholder="أدخل العنوان"></textarea>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="arabic-emergency-home-phone">رقم الاتصال</label>
+              <input type="text" class="form-control" id="arabic-emergency-home-phone" dir="rtl" placeholder="أدخل رقم الاتصال">
+            </div>
+          </div>
+
+          <!-- Australia -->
+          <div class="emergency-contact">
+            <h3 class="subsection-title">Australia</h3>
+            <div class="form-group">
+              <label class="form-label" for="arabic-emergency-aus-name">الاسم</label>
+              <input type="text" class="form-control" id="arabic-emergency-aus-name" dir="rtl" placeholder="أدخل الاسم">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="arabic-emergency-aus-address">العنوان</label>
+              <textarea class="form-control" id="arabic-emergency-aus-address" dir="rtl" placeholder="أدخل العنوان"></textarea>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="arabic-emergency-aus-relationship">صلة القرابة</label>
+              <input type="text" class="form-control" id="arabic-emergency-aus-relationship" dir="rtl" placeholder="أدخل صلة القرابة">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="arabic-emergency-aus-phone">رقم الاتصال</label>
+              <input type="text" class="form-control" id="arabic-emergency-aus-phone" dir="rtl" placeholder="أدخل رقم الاتصال">
+            </div>
+          </div>
+        </div>
+
+        <!-- 5. Education -->
+        <div class="form-section">
+          <h2 class="section-title">Education</h2>
+          <!-- High School -->
+          <div class="education-level">
+            <h3 class="subsection-title">High School</h3>
+            <div class="form-group">
+              <label class="form-label" for="arabic-education-high-school">المدرسة/الكلية</label>
+              <input type="text" class="form-control" id="arabic-education-high-school" dir="rtl" placeholder="أدخل اسم المدرسة/الكلية">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="arabic-education-high-school-course">اسم الدورة</label>
+              <input type="text" class="form-control" id="arabic-education-high-school-course" dir="rtl" placeholder="أدخل اسم الدورة">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="arabic-education-high-school-dates">تواريخ الحضور</label>
+              <input type="text" class="form-control" id="arabic-education-high-school-dates" dir="rtl" placeholder="أدخل تواريخ الحضور">
+            </div>
+          </div>
+
+          <!-- College/University -->
+          <div class="education-level">
+            <h3 class="subsection-title">College/University</h3>
+            <div class="form-group">
+              <label class="form-label" for="arabic-education-university">المدرسة/الكلية</label>
+              <input type="text" class="form-control" id="arabic-education-university" dir="rtl" placeholder="أدخل اسم المدرسة/الكلية">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="arabic-education-university-course">اسم الدورة</label>
+              <input type="text" class="form-control" id="arabic-education-university-course" dir="rtl" placeholder="أدخل اسم الدورة">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="arabic-education-university-dates">تواريخ الحضور</label>
+              <input type="text" class="form-control" id="arabic-education-university-dates" dir="rtl" placeholder="أدخل تواريخ الحضور">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="arabic-education-university-completed">هل أكملت الدورة؟</label>
+              <input type="text" class="form-control" id="arabic-education-university-completed" dir="rtl" placeholder="أدخل نعم أو لا">
+            </div>
+          </div>
+        </div>
+
+        <!-- 6. English Proficiency Test -->
+        <div class="form-section">
+          <h2 class="section-title">English Proficiency Test</h2>
+          <div class="form-group">
+            <label class="form-label" for="arabic-english-test-type">نوع الاختبار</label>
+            <input type="text" class="form-control" id="arabic-english-test-type" dir="rtl" placeholder="أدخل نوع الاختبار">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="arabic-english-test-date">تاريخ الاختبار</label>
+            <input type="text" class="form-control" id="arabic-english-test-date" dir="rtl" placeholder="أدخل تاريخ الاختبار">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="arabic-english-test-results">النتائج</label>
+            <textarea class="form-control" id="arabic-english-test-results" dir="rtl" placeholder="أدخل نتائج الاختبار"></textarea>
+          </div>
+        </div>
+
+        <!-- 7. Employment History -->
+        <div class="form-section">
+          <h2 class="section-title">Employment History</h2>
+          <div class="form-group">
+            <label class="form-label" for="arabic-employment-status">الحالة الوظيفية</label>
+            <input type="text" class="form-control" id="arabic-employment-status" dir="rtl" placeholder="أدخل الحالة الوظيفية">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="arabic-employment-organization">اسم المؤسسة</label>
+            <input type="text" class="form-control" id="arabic-employment-organization" dir="rtl" placeholder="أدخل اسم المؤسسة">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="arabic-employment-industry">نوع الصناعة</label>
+            <input type="text" class="form-control" id="arabic-employment-industry" dir="rtl" placeholder="أدخل نوع الصناعة">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="arabic-employment-address">عنوان العمل</label>
+            <textarea class="form-control" id="arabic-employment-address" dir="rtl" placeholder="أدخل عنوان العمل"></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="arabic-employment-position">تفاصيل المنصب</label>
+            <textarea class="form-control" id="arabic-employment-position" dir="rtl" placeholder="أدخل تفاصيل المنصب"></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="arabic-employment-dates">تواريخ التوظيف</label>
+            <input type="text" class="form-control" id="arabic-employment-dates" dir="rtl" placeholder="أدخل تواريخ التوظيف">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="arabic-employment-employer-name">اسم صاحب العمل</label>
+            <input type="text" class="form-control" id="arabic-employment-employer-name" dir="rtl" placeholder="أدخل اسم صاحب العمل">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="arabic-employment-employer-phone">رقم هاتف صاحب العمل</label>
+            <input type="text" class="form-control" id="arabic-employment-employer-phone" dir="rtl" placeholder="أدخل رقم الهاتف">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="arabic-unemployment-reason">سبب البطالة</label>
+            <textarea class="form-control" id="arabic-unemployment-reason" dir="rtl" placeholder="أدخل سبب البطالة"></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="arabic-unemployment-date">تاريخ البطالة</label>
+            <input type="text" class="form-control" id="arabic-unemployment-date" dir="rtl" placeholder="أدخل تاريخ البطالة">
+          </div>
+        </div>
+
+        <!-- 8. Additional Information -->
+        <div class="form-section">
+          <h2 class="section-title">Additional Information</h2>
+          <div class="form-group">
+            <label class="form-label" for="arabic-additional-info">معلومات إضافية</label>
+            <textarea class="form-control" id="arabic-additional-info" dir="rtl" placeholder="أدخل المعلومات الإضافية"></textarea>
+          </div>
+        </div>
+
+        <!-- 9. Declaration -->
+        <div class="form-section">
+          <h2 class="section-title">Declaration</h2>
+          <div class="form-group">
+            <label class="form-label" for="arabic-declaration">الإقرار</label>
+            <textarea class="form-control" id="arabic-declaration" dir="rtl" placeholder="أدخل الإقرار"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-column">
+        <!-- English translations will appear here -->
+        <!-- 1. Application Details -->
+        <div class="form-section">
+          <h2 class="section-title">Application Details</h2>
+          <div class="form-group">
+            <label class="form-label" for="english-applicant-name">Main Applicant Name</label>
+            <input type="text" class="form-control" id="english-applicant-name" placeholder="Translated name will appear here">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="english-visa-expiry">Current Visa Expiration Date</label>
+            <input type="text" class="form-control" id="english-visa-expiry" placeholder="Translated date will appear here">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="english-personal-dob">Date of Birth</label>
+            <input type="text" class="form-control" id="english-personal-dob" placeholder="Translated date of birth will appear here">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="english-personal-email">E-mail</label>
+            <input type="text" class="form-control" id="english-personal-email" placeholder="Translated email will appear here">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="english-personal-mobile">Mobile</label>
+            <input type="text" class="form-control" id="english-personal-mobile" placeholder="Translated mobile number will appear here">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="english-personal-address">Home Country Address</label>
+            <textarea class="form-control" id="english-personal-address" placeholder="Translated address will appear here"></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="english-personal-address-aus">Address in Australia (if known)</label>
+            <textarea class="form-control" id="english-personal-address-aus" placeholder="Translated Australian address will appear here"></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="english-personal-marital">Marital Status</label>
+            <input type="text" class="form-control" id="english-personal-marital" placeholder="Translated marital status will appear here">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="english-personal-medical">Medical condition (if any)</label>
+            <textarea class="form-control" id="english-personal-medical" placeholder="Translated medical condition will appear here"></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="english-personal-criminal">Police/Criminal record (if any)</label>
+            <textarea class="form-control" id="english-personal-criminal" placeholder="Translated criminal record will appear here"></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="english-personal-visa-applied">Have you applied any visa for any country?</label>
+            <select class="form-control" id="english-personal-visa-applied">
+              <option value="">Select...</option>
+              <option value="Yes">Yes</option>
+              <option value="No">No</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="english-personal-visa-status">If yes, was it approved or not?</label>
+            <textarea class="form-control" id="english-personal-visa-status" placeholder="Translated visa approval status will appear here"></textarea>
+          </div>
+        </div>
+
+        <!-- 2. Travel History -->
+        <div class="form-section">
+          <h2 class="section-title">Travel History</h2>
+          <div class="form-group">
+            <label class="form-label" for="english-travel-origin">Travel Origin</label>
+            <input type="text" class="form-control" id="english-travel-origin" placeholder="Translated origin will appear here">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="english-travel-destination">Travel Destination</label>
+            <input type="text" class="form-control" id="english-travel-destination" placeholder="Translated destination will appear here">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="english-travel-date-from">Travel Start Date</label>
+            <input type="text" class="form-control" id="english-travel-date-from" placeholder="Translated start date will appear here">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="english-travel-date-until">Travel End Date</label>
+            <input type="text" class="form-control" id="english-travel-date-until" placeholder="Translated end date will appear here">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="english-travel-reason">Travel Reason</label>
+            <textarea class="form-control" id="english-travel-reason" placeholder="Translated reason will appear here"></textarea>
+          </div>
+        </div>
+
+        <!-- 3. Family Information -->
+        <div class="form-section">
+          <h2 class="section-title">Family Information</h2>
+          <!-- Father -->
+          <div class="family-member">
+            <h3 class="subsection-title">Father</h3>
+            <div class="form-group">
+              <label class="form-label" for="english-father-name">Father's Name</label>
+              <input type="text" class="form-control" id="english-father-name" placeholder="Translated name will appear here">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="english-father-dob">Father's Date of Birth</label>
+              <input type="text" class="form-control" id="english-father-dob" placeholder="Translated date of birth will appear here">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="english-father-gender">Father's Gender</label>
+              <input type="text" class="form-control" id="english-father-gender" value="Male" readonly>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="english-father-residence">Father's Residence</label>
+              <input type="text" class="form-control" id="english-father-residence" placeholder="Translated residence will appear here">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="english-father-employment">Father's Employment Details</label>
+              <textarea class="form-control" id="english-father-employment" placeholder="Translated employment details will appear here"></textarea>
+            </div>
+          </div>
+
+          <!-- Mother -->
+          <div class="family-member">
+            <h3 class="subsection-title">Mother</h3>
+            <div class="form-group">
+              <label class="form-label" for="english-mother-name">Mother's Name</label>
+              <input type="text" class="form-control" id="english-mother-name" placeholder="Translated name will appear here">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="english-mother-dob">Mother's Date of Birth</label>
+              <input type="text" class="form-control" id="english-mother-dob" placeholder="Translated date of birth will appear here">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="english-mother-gender">Mother's Gender</label>
+              <input type="text" class="form-control" id="english-mother-gender" value="Female" readonly>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="english-mother-residence">Mother's Residence</label>
+              <input type="text" class="form-control" id="english-mother-residence" placeholder="Translated residence will appear here">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="english-mother-employment">Mother's Employment Details</label>
+              <textarea class="form-control" id="english-mother-employment" placeholder="Translated employment details will appear here"></textarea>
+            </div>
+          </div>
+
+          <!-- Father-in-law -->
+          <div class="family-member">
+            <h3 class="subsection-title">Father-in-law</h3>
+            <div class="form-group">
+              <label class="form-label" for="english-father-in-law-name">Father-in-law's Name</label>
+              <input type="text" class="form-control" id="english-father-in-law-name" placeholder="Translated name will appear here">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="english-father-in-law-dob">Father-in-law's Date of Birth</label>
+              <input type="text" class="form-control" id="english-father-in-law-dob" placeholder="Translated date of birth will appear here">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="english-father-in-law-gender">Father-in-law's Gender</label>
+              <select class="form-control" id="english-father-in-law-gender">
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="english-father-in-law-residence">Father-in-law's Residence</label>
+              <input type="text" class="form-control" id="english-father-in-law-residence" placeholder="Translated residence will appear here">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="english-father-in-law-employment">Father-in-law's Employment Details</label>
+              <textarea class="form-control" id="english-father-in-law-employment" placeholder="Translated employment details will appear here"></textarea>
+            </div>
+          </div>
+
+          <!-- Mother-in-law -->
+          <div class="family-member">
+            <h3 class="subsection-title">Mother-in-law</h3>
+            <div class="form-group">
+              <label class="form-label" for="english-mother-in-law-name">Mother-in-law's Name</label>
+              <input type="text" class="form-control" id="english-mother-in-law-name" placeholder="Translated name will appear here">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="english-mother-in-law-dob">Mother-in-law's Date of Birth</label>
+              <input type="text" class="form-control" id="english-mother-in-law-dob" placeholder="Translated date of birth will appear here">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="english-mother-in-law-gender">Mother-in-law's Gender</label>
+              <select class="form-control" id="english-mother-in-law-gender">
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="english-mother-in-law-residence">Mother-in-law's Residence</label>
+              <input type="text" class="form-control" id="english-mother-in-law-residence" placeholder="Translated residence will appear here">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="english-mother-in-law-employment">Mother-in-law's Employment Details</label>
+              <textarea class="form-control" id="english-mother-in-law-employment" placeholder="Translated employment details will appear here"></textarea>
+            </div>
+          </div>
+
+          <!-- Spouse/Partner -->
+          <div class="family-member">
+            <h3 class="subsection-title">Spouse/Partner</h3>
+            <div class="form-group">
+              <label class="form-label" for="english-spouse-name">Spouse/Partner's Name</label>
+              <input type="text" class="form-control" id="english-spouse-name" placeholder="Translated name will appear here">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="english-spouse-dob">Spouse/Partner's Date of Birth</label>
+              <input type="text" class="form-control" id="english-spouse-dob" placeholder="Translated date of birth will appear here">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="english-spouse-gender">Spouse/Partner's Gender</label>
+              <select class="form-control" id="english-spouse-gender">
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="english-spouse-residence">Spouse/Partner's Residence</label>
+              <input type="text" class="form-control" id="english-spouse-residence" placeholder="Translated residence will appear here">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="english-spouse-employment">Spouse/Partner's Employment Details</label>
+              <textarea class="form-control" id="english-spouse-employment" placeholder="Translated employment details will appear here"></textarea>
+            </div>
+          </div>
+
+          <!-- Siblings -->
+          <div class="family-member">
+            <h3 class="subsection-title">Sisters/Brothers</h3>
+            <div class="form-group">
+              <label class="form-label" for="english-siblings">Sisters/Brothers Information</label>
+              <textarea class="form-control" id="english-siblings" placeholder="Translated information will appear here"></textarea>
+            </div>
+          </div>
+
+          <!-- Children -->
+          <div class="family-member">
+            <h3 class="subsection-title">Children</h3>
+            <div class="form-group">
+              <label class="form-label" for="english-children">Children Information</label>
+              <textarea class="form-control" id="english-children" placeholder="Translated information will appear here"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4. Emergency Contacts -->
+        <div class="form-section">
+          <h2 class="section-title">Emergency Contacts</h2>
+          <!-- Home Country -->
+          <div class="emergency-contact">
+            <h3 class="subsection-title">Home Country</h3>
+            <div class="form-group">
+              <label class="form-label" for="english-emergency-home-name">Name</label>
+              <input type="text" class="form-control" id="english-emergency-home-name" placeholder="Translated name will appear here">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="english-emergency-home-relationship">Relationship</label>
+              <input type="text" class="form-control" id="english-emergency-home-relationship" placeholder="Translated relationship will appear here">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="english-emergency-home-address">Address</label>
+              <textarea class="form-control" id="english-emergency-home-address" placeholder="Translated address will appear here"></textarea>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="english-emergency-home-phone">Phone</label>
+              <input type="text" class="form-control" id="english-emergency-home-phone" placeholder="Translated phone will appear here">
+            </div>
+          </div>
+
+          <!-- Australia -->
+          <div class="emergency-contact">
+            <h3 class="subsection-title">Australia</h3>
+            <div class="form-group">
+              <label class="form-label" for="english-emergency-aus-name">Name</label>
+              <input type="text" class="form-control" id="english-emergency-aus-name" placeholder="Translated name will appear here">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="english-emergency-aus-address">Address</label>
+              <textarea class="form-control" id="english-emergency-aus-address" placeholder="Translated address will appear here"></textarea>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="english-emergency-aus-relationship">Relationship</label>
+              <input type="text" class="form-control" id="english-emergency-aus-relationship" placeholder="Translated relationship will appear here">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="english-emergency-aus-phone">Phone</label>
+              <input type="text" class="form-control" id="english-emergency-aus-phone" placeholder="Translated phone will appear here">
+            </div>
+          </div>
+        </div>
+
+        <!-- 5. Education -->
+        <div class="form-section">
+          <h2 class="section-title">Education</h2>
+          <!-- High School -->
+          <div class="education-level">
+            <h3 class="subsection-title">High School</h3>
+            <div class="form-group">
+              <label class="form-label" for="english-education-high-school">School/College</label>
+              <input type="text" class="form-control" id="english-education-high-school" placeholder="Translated school/college will appear here">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="english-education-high-school-course">Course Name</label>
+              <input type="text" class="form-control" id="english-education-high-school-course" placeholder="Translated course name will appear here">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="english-education-high-school-dates">Attendance Dates</label>
+              <input type="text" class="form-control" id="english-education-high-school-dates" placeholder="Translated attendance dates will appear here">
+            </div>
+          </div>
+
+          <!-- College/University -->
+          <div class="education-level">
+            <h3 class="subsection-title">College/University</h3>
+            <div class="form-group">
+              <label class="form-label" for="english-education-university">School/College</label>
+              <input type="text" class="form-control" id="english-education-university" placeholder="Translated school/college will appear here">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="english-education-university-course">Course Name</label>
+              <input type="text" class="form-control" id="english-education-university-course" placeholder="Translated course name will appear here">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="english-education-university-dates">Attendance Dates</label>
+              <input type="text" class="form-control" id="english-education-university-dates" placeholder="Translated attendance dates will appear here">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="english-education-university-completed">Completed Course?</label>
+              <input type="text" class="form-control" id="english-education-university-completed" placeholder="Translated completion status will appear here">
+            </div>
+          </div>
+        </div>
+
+        <!-- 6. English Proficiency Test -->
+        <div class="form-section">
+          <h2 class="section-title">English Proficiency Test</h2>
+          <div class="form-group">
+            <label class="form-label" for="english-english-test-type">Test Type</label>
+            <input type="text" class="form-control" id="english-english-test-type" placeholder="Translated test type will appear here">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="english-english-test-date">Test Date</label>
+            <input type="text" class="form-control" id="english-english-test-date" placeholder="Translated test date will appear here">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="english-english-test-results">Test Results</label>
+            <textarea class="form-control" id="english-english-test-results" placeholder="Translated test results will appear here"></textarea>
+          </div>
+        </div>
+
+        <!-- 7. Employment History -->
+        <div class="form-section">
+          <h2 class="section-title">Employment History</h2>
+          <div class="form-group">
+            <label class="form-label" for="english-employment-status">Employment Status</label>
+            <input type="text" class="form-control" id="english-employment-status" placeholder="Translated employment status will appear here">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="english-employment-organization">Organization Name</label>
+            <input type="text" class="form-control" id="english-employment-organization" placeholder="Translated organization name will appear here">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="english-employment-industry">Industry Type</label>
+            <input type="text" class="form-control" id="english-employment-industry" placeholder="Translated industry type will appear here">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="english-employment-address">Work Address</label>
+            <textarea class="form-control" id="english-employment-address" placeholder="Translated work address will appear here"></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="english-employment-position">Job Position Details</label>
+            <textarea class="form-control" id="english-employment-position" placeholder="Translated job position details will appear here"></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="english-employment-dates">Employment Dates</label>
+            <input type="text" class="form-control" id="english-employment-dates" placeholder="Translated employment dates will appear here">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="english-employment-employer-name">Employer Name</label>
+            <input type="text" class="form-control" id="english-employment-employer-name" placeholder="Translated employer name will appear here">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="english-employment-employer-phone">Employer Phone</label>
+            <input type="text" class="form-control" id="english-employment-employer-phone" placeholder="Translated employer phone will appear here">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="english-unemployment-reason">Unemployment Reason</label>
+            <textarea class="form-control" id="english-unemployment-reason" placeholder="Translated unemployment reason will appear here"></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="english-unemployment-date">Unemployment Date</label>
+            <input type="text" class="form-control" id="english-unemployment-date" placeholder="Translated unemployment date will appear here">
+          </div>
+        </div>
+
+        <!-- 8. Additional Information -->
+        <div class="form-section">
+          <h2 class="section-title">Additional Information</h2>
+          <div class="form-group">
+            <label class="form-label" for="english-additional-info">Additional Information</label>
+            <textarea class="form-control" id="english-additional-info" placeholder="Translated additional information will appear here"></textarea>
+          </div>
+        </div>
+
+        <!-- 9. Declaration -->
+        <div class="form-section">
+          <h2 class="section-title">Declaration</h2>
+          <div class="form-group">
+            <label class="form-label" for="english-declaration">Declaration</label>
+            <textarea class="form-control" id="english-declaration" placeholder="Translated declaration will appear here"></textarea>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <div id="status" class="status"></div>
+
+
+  </div>
+  <div class="actions">
+    <button id="translateBtn" class="btn btn-primary">
+      <span class="btn-text">Translate All</span>
+    </button>
+    <button id="generateBtn" class="btn btn-success">
+      <span class="btn-text">Generate Documents</span>
+    </button>
+  </div>
+
+
+  <script src="renderer.js"></script>
+</body>
+</html>

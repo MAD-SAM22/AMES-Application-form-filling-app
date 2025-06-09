@@ -1,0 +1,248 @@
+.form-container {
+  display: flex;
+  gap: 2rem;
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.form-column {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.form-section {
+  background-color: #ffffff;
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.section-title {
+  color: #2c3e50;
+  font-size: 1.5rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #3498db;
+}
+
+.subsection-title {
+  color: #34495e;
+  font-size: 1.2rem;
+  margin: 1rem 0;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #bdc3c7;
+}
+
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #2c3e50;
+  font-weight: 500;
+}
+
+.form-control {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #bdc3c7;
+  border-radius: 4px;
+  font-size: 1rem;
+  transition: border-color 0.2s ease-in-out;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: #3498db;
+  box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+}
+
+/* Family Member Sections */
+.family-member {
+  background-color: #f8f9fa;
+  border-radius: 6px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.family-member:last-child {
+  margin-bottom: 0;
+}
+
+/* Emergency Contact Sections */
+.emergency-contact {
+  background-color: #f8f9fa;
+  border-radius: 6px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.emergency-contact:last-child {
+  margin-bottom: 0;
+}
+
+/* Education Level Sections */
+.education-level {
+  background-color: #f8f9fa;
+  border-radius: 6px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.education-level:last-child {
+  margin-bottom: 0;
+}
+
+/* Textarea Specific Styles */
+textarea.form-control {
+  min-height: 100px;
+  resize: vertical;
+}
+
+/* RTL Support */
+[dir="rtl"] {
+  text-align: right;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+  .form-container {
+    flex-direction: column;
+  }
+  
+  .form-column {
+    width: 100%;
+  }
+}
+
+/* Loading States */
+.form-control.loading {
+  background-color: #f8f9fa;
+  cursor: wait;
+}
+
+/* Success States */
+.form-control.success {
+  border-color: #2ecc71;
+}
+
+/* Error States */
+.form-control.error {
+  border-color: #e74c3c;
+}
+
+/* Placeholder Styles */
+.form-control::placeholder {
+  color: #95a5a6;
+}
+
+/* Hover Effects */
+.form-control:hover:not(:focus) {
+  border-color: #95a5a6;
+}
+
+/* Required Field Indicator */
+.form-label.required::after {
+  content: " *";
+  color: #e74c3c;
+}
+
+/* Section Headers */
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+/* Help Text */
+.help-text {
+  font-size: 0.875rem;
+  color: #7f8c8d;
+  margin-top: 0.25rem;
+}
+
+/* Print Styles */
+@media print {
+  .form-container {
+    display: block;
+    max-width: none;
+    padding: 0;
+  }
+  
+  .form-section {
+    break-inside: avoid;
+    box-shadow: none;
+    border: 1px solid #bdc3c7;
+    margin-bottom: 1rem;
+  }
+  
+  .form-control {
+    border: 1px solid #bdc3c7;
+  }
+}
+
+/* Sibling Member Styles */
+.sibling-member {
+  background-color: #f8f9fa;
+  border-radius: 6px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border: 1px solid #e2e8f0;
+}
+
+.sibling-member:last-child {
+  margin-bottom: 0;
+}
+
+.sibling-title {
+  color: #2c3e50;
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+#siblings-count {
+  max-width: 200px;
+  margin-bottom: 1rem;
+}
+
+#siblings-container {
+  margin-top: 1rem;
+}
+
+/* Child Member Styles */
+.child-member {
+  background-color: #f8f9fa;
+  border-radius: 6px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border: 1px solid #e2e8f0;
+}
+
+.child-member:last-child {
+  margin-bottom: 0;
+}
+
+.child-title {
+  color: #2c3e50;
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+#children-count {
+  max-width: 200px;
+  margin-bottom: 1rem;
+}
+
+#children-container {
+  margin-top: 1rem;
+} 
