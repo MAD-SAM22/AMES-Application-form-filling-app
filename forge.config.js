@@ -12,11 +12,7 @@ module.exports = {
     {
       name: '@electron-forge/maker-squirrel',
       config: {
-        name: 'arabic-to-english-form-translator',
-        authors: 'Osama hosam',
-        setupIcon: './logo.ico',
-        noMsi: true,
-        iconUrl: 'file:///C:/Users/Osama%20hosam/Documents/GitHub/AMES-Application-form-filling-app/logo.ico'
+        name: 'arabic-to-english-form-translator'
       }
     },
     {
@@ -30,7 +26,7 @@ module.exports = {
       name: '@electron-forge/maker-deb',
       config: {
         options: {
-          icon: './logo.png'
+          icon: './logo.ico'
         }
       }
     },
@@ -38,7 +34,7 @@ module.exports = {
       name: '@electron-forge/maker-rpm',
       config: {
         options: {
-          icon: './logo.png'
+          icon: './logo.ico'
         }
       }
     }

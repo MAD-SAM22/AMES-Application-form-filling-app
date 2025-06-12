@@ -37,44 +37,5 @@
     "electron-squirrel-startup": "^1.0.1",
     "libreoffice-convert": "^1.6.1",
     "pizzip": "^3.2.0"
-  },
-  "config": {
-    "forge": {
-      "packagerConfig": {
-        "icon": "./logo.ico",
-        "arch": ["x64"]
-      },
-      "makers": [
-        {
-          "name": "@electron-forge/maker-squirrel",
-          "config": {
-            "iconUrl": "./logo.ico",
-            "setupIcon": "./logo.ico"
-          }
-        },
-        {
-          "name": "@electron-forge/maker-zip",
-          "platforms": [
-            "darwin"
-          ]
-        },
-        {
-          "name": "@electron-forge/maker-deb",
-          "config": {
-            "options": {
-              "icon": "./logo.png"
-            }
-          }
-        },
-        {
-          "name": "@electron-forge/maker-rpm",
-          "config": {
-            "options": {
-              "icon": "./logo.png"
-            }
-          }
-        }
-      ]
-    }
   }
 }
