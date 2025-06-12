@@ -15,7 +15,8 @@ module.exports = {
         name: 'arabic-to-english-form-translator',
         authors: 'Osama hosam',
         setupIcon: './logo.ico',
-        noMsi: true
+        noMsi: true,
+        iconUrl: 'file:///C:/Users/Osama%20hosam/Documents/GitHub/AMES-Application-form-filling-app/logo.ico'
       }
     },
     {
